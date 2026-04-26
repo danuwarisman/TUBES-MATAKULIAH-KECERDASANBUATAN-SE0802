@@ -8,9 +8,9 @@ import random  # buat ngacak populasi, crossover point, mutasi
 #
 # alurnya:
 #   1. bikin 100 kandidat solusi acak (populasi)
-#   2. nilai tiap kandidat → disebut fitness
+#   2. nilai tiap kandidat -> disebut fitness
 #   3. yang bagus lebih sering kepilih jadi orangtua
-#   4. orangtua kawin → anak dapet campuran gen keduanya (crossover)
+#   4. orangtua kawin -> anak dapet campuran gen keduanya (crossover)
 #   5. sesekali ada perubahan acak kecil di anak (mutasi) biar ga nge-stuck
 #   6. ulangi N generasi, ambil yang terbaik
 # ==============================================================================
@@ -21,7 +21,7 @@ import random  # buat ngacak populasi, crossover point, mutasi
 # ==============================================================================
 
 POP_SIZE = 100   # jumlah kandidat per generasi
-N_BITS   = 16    # tiap variabel dikodekan jadi 16 bit → 2^16 = 65536 kemungkinan nilai, presisi ~0.0003
+N_BITS   = 16    # tiap variabel dikodekan jadi 16 bit -> 2^16 = 65536 kemungkinan nilai, presisi ~0.0003
 N_GEN    = 100   # jumlah generasi (kriteria penghentian)
 PC       = 0.80  # peluang crossover 80% — 20% sisanya anak = copy orangtua
 PM       = 0.01  # peluang mutasi per bit 1% — biar GA bisa explore area baru
@@ -53,7 +53,7 @@ def fungsi_objektif(x1, x2):
 # ==============================================================================
 # HITUNG FITNESS
 # GA kerjanya dengan memaksimalkan fitness, sedangkan kita mau MINIMUMKAN f
-# solusinya: fitness = -f → f makin kecil, fitness makin gede, GA makin suka
+# solusinya: fitness = -f -> f makin kecil, fitness makin gede, GA makin suka
 # ==============================================================================
 def hitung_fitness(x1, x2):
     f = fungsi_objektif(x1, x2)           # hitung nilai fungsinya dulu
@@ -65,7 +65,7 @@ def hitung_fitness(x1, x2):
 
 
 # ==============================================================================
-# ENKODE — nilai x (desimal) → kromosom biner
+# ENKODE — nilai x (desimal) -> kromosom biner
 # GA mainnya di level bit, jadi x1 dan x2 harus diubah ke biner dulu
 #
 # caranya:
@@ -73,8 +73,8 @@ def hitung_fitness(x1, x2):
 #   2. ubah integer itu ke list bit
 # ==============================================================================
 def enkode(x, n_bits):
-    # (x - X_MIN) / (X_MAX - X_MIN) → normalisasi x ke 0.0–1.0
-    # dikali (2^n - 1) → scale ke range integer
+    # (x - X_MIN) / (X_MAX - X_MIN) -> normalisasi x ke 0.0–1.0
+    # dikali (2^n - 1) -> scale ke range integer
     int_val = round((x - X_MIN) / (X_MAX - X_MIN) * (2 ** n_bits - 1))
     int_val = max(0, min(2 ** n_bits - 1, int_val))  # clamp biar ga keluar rentang
 
@@ -84,14 +84,14 @@ def enkode(x, n_bits):
 
 
 # ==============================================================================
-# DEKODE — kromosom biner → nilai x1 dan x2 asli
+# DEKODE — kromosom biner -> nilai x1 dan x2 asli
 # dipake tiap mau ngitung fitness: fungsi objektif butuh nilai desimal, bukan bit
 # ==============================================================================
 def dekode(kromosom, n_bits):
     def bits_ke_float(bits):
         int_val = 0
         for bit in bits:
-            int_val = int_val * 2 + bit  # baca biner → desimal: geser kiri (*2) + bit berikutnya
+            int_val = int_val * 2 + bit  # baca biner -> desimal: geser kiri (*2) + bit berikutnya
 
         return X_MIN + int_val * (X_MAX - X_MIN) / (2 ** n_bits - 1)  # scale balik ke [-10, 10]
 
@@ -123,7 +123,7 @@ def inisialisasi_populasi(pop_size, n_bits, x1_seed=None, x2_seed=None):
 # SELEKSI ORANGTUA — Tournament Selection
 # pilih k individu acak, yang fitness-nya tertinggi di antara k itu yang menang
 # lebih adil dari roulette wheel: yang biasa-biasa pun masih bisa kepilih
-# → populasi tetep beragam, ga cepet-cepet konvergen ke satu titik
+# -> populasi tetep beragam, ga cepet-cepet konvergen ke satu titik
 # ==============================================================================
 def seleksi_turnamen(populasi, fitness_list, k=3):
     kandidat_idx = random.sample(range(len(populasi)), k)                  # pilih k indeks acak
@@ -137,7 +137,7 @@ def seleksi_turnamen(populasi, fitness_list, k=3):
 #
 # contoh (8 bit):
 #   P1: [1,0,1,0 | 1,1,0,1]      C1: [1,0,1,0 | 0,0,1,0]  ← kiri P1 + kanan P2
-#   P2: [0,1,0,1 | 0,0,1,0]  →   C2: [0,1,0,1 | 1,1,0,1]  ← kiri P2 + kanan P1
+#   P2: [0,1,0,1 | 0,0,1,0]  ->   C2: [0,1,0,1 | 1,1,0,1]  ← kiri P2 + kanan P1
 # ==============================================================================
 def crossover(parent1, parent2, pc):
     if random.random() < pc:                          # crossover terjadi kalau acakan < pc (80%)
@@ -151,19 +151,19 @@ def crossover(parent1, parent2, pc):
 
 # ==============================================================================
 # MUTASI — Bit-Flip Mutation
-# tiap bit punya peluang kecil (1%) buat ke-flip: 0→1 atau 1→0
+# tiap bit punya peluang kecil (1%) buat ke-flip: 0->1 atau 1->0
 # penting biar GA bisa explore area yang belum pernah dijamah crossover
 # ==============================================================================
 def mutasi(kromosom, pm):
-    # kalau random < pm → flip bit (1 - bit), kalau engga → biarin
+    # kalau random < pm -> flip bit (1 - bit), kalau engga -> biarin
     return [1 - bit if random.random() < pm else bit for bit in kromosom]
 
 
 # ==============================================================================
 # BUAT GENERASI BARU — Generational Replacement + Elitisme
 # 1. individu terbaik langsung dilolosin tanpa diutak-atik (elitisme)
-#    → biar solusi terbaik ga ilang gara-gara kena mutasi
-# 2. sisa slot diisi offspring dari seleksi → crossover → mutasi
+#    -> biar solusi terbaik ga ilang gara-gara kena mutasi
+# 2. sisa slot diisi offspring dari seleksi -> crossover -> mutasi
 # ==============================================================================
 def buat_generasi_baru(populasi, fitness_list, pop_size, pc, pm):
     populasi_baru = []
@@ -176,7 +176,7 @@ def buat_generasi_baru(populasi, fitness_list, pop_size, pc, pm):
         parent1 = seleksi_turnamen(populasi, fitness_list)  # pilih orangtua 1
         parent2 = seleksi_turnamen(populasi, fitness_list)  # pilih orangtua 2
 
-        child1, child2 = crossover(parent1, parent2, pc)    # kawinkan → dapet dua anak
+        child1, child2 = crossover(parent1, parent2, pc)    # kawinkan -> dapet dua anak
         child1 = mutasi(child1, pm)                          # mutasi anak 1
         child2 = mutasi(child2, pm)                          # mutasi anak 2
 
@@ -235,10 +235,10 @@ def main():
     # LANGKAH 2: evolusi sebanyak N_GEN generasi
     for gen in range(1, N_GEN + 1):
 
-        # decode tiap kromosom → hitung fitness → simpan ke list
+        # decode tiap kromosom -> hitung fitness -> simpan ke list
         fitness_list = []
         for kromosom in populasi:
-            x1, x2 = dekode(kromosom, N_BITS)   # biner → nilai x1, x2
+            x1, x2 = dekode(kromosom, N_BITS)   # biner -> nilai x1, x2
             fit    = hitung_fitness(x1, x2)      # hitung fitness-nya
             fitness_list.append(fit)
 
@@ -259,7 +259,7 @@ def main():
 
     # LANGKAH 3: tampilin hasil akhir
     f_minimum    = fungsi_objektif(x1_terbaik, x2_terbaik)
-    kromosom_str = ''.join(map(str, kromosom_terbaik_global))  # list bit → string "10110..."
+    kromosom_str = ''.join(map(str, kromosom_terbaik_global))  # list bit -> string "10110..."
 
     print()
     print("=" * 55)
