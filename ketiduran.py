@@ -1,19 +1,19 @@
 import math, random
 
-# ── Konstanta GA ───────────────────────────────────────────
-BITS     = 8
-LEN      = BITS * 2
-XMIN, XMAX = -10.0, 10.0
-POP_SIZE = 6
-MAX_GEN  = 5
-PC       = 0.8
-PM       = 0.05
+# PARAMETER GA
+BITS     = 8                # bit per variabel (x1 atau x2)
+LEN      = BITS * 2         # total bit per kromosom (x1 + x2)
+XMIN, XMAX = -10.0, 10.0    # domain
+POP_SIZE = 6                # ukuran populasi
+MAX_GEN  = 5                # jumlah generasi
+PC       = 0.8              # probabilitas crossover
+PM       = 0.05             # probabilitas mutasi
 
 # Fungsi objektif yang ingin diminimasi 
-def f(x1, x2):
+def f(x1, x2):  
     try:
         v = -(math.sin(x1)*math.cos(x2)*math.tan(x1+x2) + 0.5*math.exp(1-abs(x2)))
-        return v if math.isfinite(v) else float('inf')
+        return v if math.isfinite(v) else float('inf') 
     except: return float('inf')
 
 # 1. INISIALISASI POPULASI
@@ -23,7 +23,7 @@ def encode(x):
     iv = round((x-XMIN)/(XMAX-XMIN)*(2**BITS-1))
     return [int(b) for b in format(max(0,min(2**BITS-1,iv)), f'0{BITS}b')]
 
-def inisialisasi(x1s, x2s):
+def inisialisasi(x1s, x2s): 
     pop = [encode(x1s)+encode(x2s)]
     pop += [[random.randint(0,1) for _ in range(LEN)] for _ in range(POP_SIZE-1)]
     return pop
@@ -57,11 +57,11 @@ def seleksi_roulette(pop, fit):
 
 # 5. CROSSOVER — Single-Point
 #    Tukar gen di titik potong acak dengan probabilitas PC
-def crossover(p1, p2):
+def crossover(p1, p2):  # Menerima input parent 1 dan 2 yg berisi 16 angka biner
     if random.random() < PC:
-        t = random.randint(1, LEN-1)
-        return p1[:t]+p2[t:], p2[:t]+p1[t:]
-    return p1[:], p2[:]
+        t = random.randint(1, LEN-1) # Titik potong acak antara 1 dan 15 (karena 16 bit)
+        return p1[:t]+p2[t:], p2[:t]+p1[t:] # Tukar gen setelah titik potong
+    return p1[:], p2[:] 
 
 
 # 6. MUTASI — Bit-Flip
